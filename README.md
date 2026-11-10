@@ -1,12 +1,49 @@
 # Honor Magic8 Pro — Privacy & Ad-Surface Hardening
 
 A reproducible, **reversible** set of KernelSU modules + scripts that reduce ad surfaces,
-telemetry and tracker exposure on an Honor Magic8 Pro (MagicOS 11 / Android 17), designed to
-run **only when root is available** — exploit-based temporary root included.
+telemetry and tracker exposure on an Honor Magic8 Pro (MagicOS 11 / Android 17).
+
+---
+
+> ## ⚠️ This project requires root
+>
+> **Every module here needs root (KernelSU) to do anything.** Without root,
+> `pm disable` on another package's component fails with
+> `SecurityException: Shell cannot change component state`, and `/data/adb/modules/`
+> is never executed.
+>
+> **How root is obtained on this device:** it is a *device-specific kernel exploit*
+> (CVE-2026-98260 class, delivered by a third-party temporary-root tool) that loads
+> `kernelsu.ko` at runtime. Details are deliberately omitted here.
+>
+> Consequences you must accept before using this repo:
+>
+> - **Root does not survive a reboot.** The bootloader is locked
+>   (`ro.boot.flash.locked=1`), `/system` is read-only erofs under
+>   `dm-verity=enforcing`, so there is no supported way to persist a patched kernel.
+>   Root must be re-acquired after every boot.
+> - **Exploit-based root carries real risk**, including kernel panics and data loss.
+>   Nothing in this repository is a substitute for the exploit's own safety notes.
+> - The modules here only automate the *cleanup* after root is obtained — they do not
+>   obtain root, and they do not make root persistent.
+>
+> If your device is not rooted, or you are not willing to run an exploit on it,
+> **this repository is not for you.** Nothing here is needed to read the documentation.
+
+---
 
 > Tested on one device (Honor Magic8 Pro, MagicOS 11.0.0, Android 17, arm64).
 > Everything here is **opt-in, idempotent and reversible**. Nothing touches `/system`
 > or any verified partition.
+
+## Requirements
+
+| Requirement | Notes |
+|---|---|
+| **Root (KernelSU)** | mandatory; `ksud` must be at `/data/adb/ksud` |
+| KernelSU ≥ 3.x | for `ksud module action`, and `late-load` stage script execution |
+| Honor Magic8 Pro / MagicOS 11 | package names and `settings` keys are MagicOS-specific |
+| `adb` (optional) | for installation and verification |
 
 ## What this is
 

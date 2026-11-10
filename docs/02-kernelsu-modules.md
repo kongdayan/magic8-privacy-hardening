@@ -1,5 +1,11 @@
 # 02 — KernelSU modules: structure, order, and four gotchas
 
+> **Requires root.** These modules are meaningless without KernelSU: `pm disable` on another
+> package's component is refused for `shell` (`SecurityException: Shell cannot change
+> component state`), and nothing under `/data/adb/modules/` runs. On this device root comes
+> from a temporary kernel exploit and is lost on every reboot — see the warning in the
+> top-level README.
+
 ## Why modules can run automatically
 
 `ksud` exposes lifecycle triggers:
