@@ -1,0 +1,6 @@
+id=a4-abox-lockdown
+name=AsteriskBOX 本地端口封闭
+version=1.0
+versionCode=1
+author=kongdayan
+description=拒绝 loopback 访问代理 App 的本地入站端口（mixed / tproxy），防止其他 App 扫本机端口发现透明代理。仅作用于 iif lo，不影响 TPROXY 投递。点「操作」切换 lock/unlock。

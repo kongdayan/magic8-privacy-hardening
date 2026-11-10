@@ -1,0 +1,6 @@
+id=a3-honor-ads-components
+name=Honor adsdk 组件级禁用
+version=1.0
+versionCode=1
+author=kongdayan
+description=禁用 124 个 com.hihonor.adsdk.* 广告落地 Activity / 适配器 Provider（13 个系统包）。第三方广告 SDK（穿山甲/优量汇等）一概不碰。点「操作」切换 禁用/恢复。

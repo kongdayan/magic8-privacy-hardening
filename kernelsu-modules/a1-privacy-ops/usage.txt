@@ -1,0 +1,10 @@
+com.hihonor.lbs
+com.hihonor.searchservice
+com.google.android.gms
+com.hihonor.magicvoice
+com.hihonor.awareness
+com.hihonor.id
+com.hihonor.brain
+com.hihonor.ouc
+com.hihonor.hncloud
+com.android.adservices.api

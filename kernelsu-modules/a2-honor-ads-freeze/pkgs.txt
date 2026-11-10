@@ -1,0 +1,9 @@
+com.hihonor.hiboard
+com.hihonor.magazine
+com.hihonor.livewallpaper.paradise
+com.hihonor.hiviewpush
+com.hihonor.hiviewtunnel
+com.hihonor.quickengine
+com.hihonor.quickgame
+com.honor.yoyocards
+com.android.adservices.api

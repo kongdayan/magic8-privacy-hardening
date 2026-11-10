@@ -1,0 +1,6 @@
+id=a0-privacy-settings
+name=Honor 广告/遥测/反诈 开关键
+version=1.0
+versionCode=1
+author=kongdayan
+description=38 项 settings 键（广告推荐 / 遥测上报 / 云端查杀 / 反诈可配置项）+ Deeplink 跳转拦截。幂等，写后回读校验；被系统写回的键每次提权都会重放。

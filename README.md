@@ -1,0 +1,99 @@
+# Honor Magic8 Pro — Privacy & Ad-Surface Hardening
+
+A reproducible, **reversible** set of KernelSU modules + scripts that reduce ad surfaces,
+telemetry and tracker exposure on an Honor Magic8 Pro (MagicOS 11 / Android 17), designed to
+run **only when root is available** — exploit-based temporary root included.
+
+> Tested on one device (Honor Magic8 Pro, MagicOS 11.0.0, Android 17, arm64).
+> Everything here is **opt-in, idempotent and reversible**. Nothing touches `/system`
+> or any verified partition.
+
+## What this is
+
+| Layer | Where it lives | Survives reboot | Needs root |
+|---|---|---|---|
+| `pm disable-user` (app freeze) | `/data/system/users/0/package-restrictions.xml` | ✅ | once |
+| `pm disable pkg/component` (component-level) | same | ✅ | once |
+| `appops` / permission revoke | `/data/system/appops/` | ✅ | once |
+| `settings put` keys | `settings_global.xml` / `settings_secure.xml` | ✅ | once |
+| Proxy route rules (AsteriskBOX / sing-box) | app's own Room DB | ✅ | once |
+| KernelSU modules (this repo) | `/data/adb/modules/` | ✅ | at apply time |
+| iptables rules (TPROXY, port lockdown) | kernel memory | ❌ rebuilt | at runtime |
+
+**Key idea:** root is only needed as a *one-shot scalpel*. The effects live in `/data`,
+so they persist even after root is gone. Only runtime state (iptables, daemons) is rebuilt —
+and the KernelSU modules in this repo do that automatically the moment root appears.
+
+## Layout
+
+```
+kernelsu-modules/          five independent KernelSU modules (enable/disable separately)
+  a0-privacy-settings/     38 settings keys + deeplink interception
+  a1-privacy-ops/          appops + sensitive-permission revoke
+  a2-honor-ads-freeze/     9 packages frozen (pm disable-user)
+  a3-honor-ads-components/ 124 com.hihonor.adsdk.* components
+  a4-abox-lockdown/        loopback port lockdown for the proxy app
+docs/
+  01-persistence-model.md          what survives reboot vs what does not
+  02-kernelsu-modules.md           module structure, execution order, four gotchas
+  03-ad-surface-inventory.md       where ad slots / trackers actually live on MagicOS
+  04-proxy-detectability.md        can apps detect a transparent proxy? what leaks
+  05-tailscale-coexistence.md      running Tailscale and a TPROXY proxy together
+scripts/
+  abox-lockdown.sh          standalone port lockdown (no module needed)
+  rollback-ads-activities.sh generated rollback for a3
+install.sh                  copy modules into /data/adb/modules (requires root)
+```
+
+## Install
+
+```bash
+# 1. push this repo to the device
+adb push kernelsu-modules /data/local/tmp/kmods
+adb push install.sh /data/local/tmp/
+
+# 2. install (root required)
+adb shell su -c 'sh /data/local/tmp/install.sh /data/local/tmp/kmods'
+```
+
+`install.sh` copies each module into `/data/adb/modules/<id>/`, fixes permissions and
+runs every `service.sh` once so the state is applied immediately.
+
+Then each module appears in the KernelSU manager with an **Action** button
+(`action.sh`) that toggles its group and reports the result.
+
+## Toggle
+
+```bash
+su -c 'ksud module action a2-honor-ads-freeze'    # toggle one group
+su -c 'ksud module disable a3-honor-ads-components'  # stop auto-applying
+su -c 'ksud module enable  a3-honor-ads-components'
+su -c 'ksud module uninstall a4-abox-lockdown'
+```
+
+Execution order is alphabetical by module id, which is why the ids are `a0`…`a4`:
+the fragile `settings` writes run first, the heavy 124× `pm disable` runs later.
+
+## Safety notes
+
+- **Nothing here modifies `/system`.** No OTA/verity/brick risk.
+- Component disabling is **root-only** for other packages
+  (`shell` gets `SecurityException: Shell cannot change component state`).
+- Disabling `com.hihonor.adsdk.*` *activities* only removes ad landing pages — it does
+  **not** stop the ad SDK's network reporting, which runs inside the host app process.
+  For that you need domain-level blocking.
+- Uninstalling `a2` does **not** un-freeze the packages (deliberate). Use its Action button.
+- Some `settings` keys are rewritten by Honor system services on boot
+  (`network_recommendations_enabled` is hardcoded). The module replays them on every root
+  acquisition and logs a `REBOUND` line when one survives.
+
+## Not a malware scanner, not a firewall
+
+This is a personal hardening collection. It freezes ad-slot hosts, disables the vendor ad
+SDK's landing pages, cuts analytics/recommendation switches, and reduces the local
+fingerprint of a transparent proxy. It does not root the device and does not defeat
+security controls.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

@@ -1,0 +1,6 @@
+id=a1-privacy-ops
+name=隐私 ops 与敏感权限撤销
+version=1.0
+versionCode=1
+author=kongdayan
+description=10 个包禁 GET_USAGE_STATS（读取使用统计）；指定 App 撤销 SMS/通讯录/通话记录并 appops ignore。点「操作」切换 应用/恢复。
