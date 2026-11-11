@@ -26,8 +26,8 @@ declare `com.hihonor.adsdk.*` components:
 | Package | adsdk components | Kind |
 |---|---:|---|
 | `com.hihonor.android.thememanager` | 23 | 5 adapter providers + 18 landing activities |
-| `com.hihonor.quickengine` | 11 | landing activities |
-| `com.hihonor.quickgame` | 4 | landing activities |
+| `com.hihonor.quickengine` | 11 | landing activities — **not** in `a3`, the whole package is frozen by `a2` |
+| `com.hihonor.quickgame` | 4 | landing activities — **not** in `a3`, the whole package is frozen by `a2` |
 
 Everything else (launcher, search, browser, app market, push channel, YOYO) embeds the SDK
 **in dex only** — there is nothing to disable at the component level.

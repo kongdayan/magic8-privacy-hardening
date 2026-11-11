@@ -65,12 +65,6 @@ and the KernelSU modules in this repo do that automatically the moment root appe
 
 ```
 kernelsu-modules/          six independent KernelSU modules (enable/disable separately)
-  a0-privacy-settings/     38 settings keys + deeplink interception
-  a1-privacy-ops/          appops + sensitive-permission revoke
-  a2-honor-ads-freeze/     9 packages frozen (pm disable-user)
-  a3-honor-ads-components/ 124 com.hihonor.adsdk.* components
-  a4-abox-lockdown/        loopback port lockdown for the proxy app
-  a5-notif-channels/       32 marketing notification channels blocked at channel level
 docs/
   01-persistence-model.md          what survives reboot vs what does not
   02-kernelsu-modules.md           module structure, execution order, four gotchas
@@ -83,6 +77,43 @@ scripts/
   rollback-ads-activities.sh generated rollback for a3
 install.sh                  copy modules into /data/adb/modules (requires root)
 ```
+
+## 模块一览
+
+每行一句话说清「做什么 / 数据在哪 / 用什么手段 / 关掉会失去什么」。六个模块**不共享任何一行配置**，
+但同一个 app 可能被三层同时覆盖（见下一节），这是分层，不是重复。
+
+| id | 做什么 | 数据文件 | 手段 | 切到 restore 会失去什么 |
+|---|---|---|---|---|
+| `a0-privacy-settings` | 38 项系统开关：**推荐 14 · 遥测上报 10 · 反诈与查杀 14**，外加 18 条 Deeplink 前缀拦截 | `keys.txt` `deeplink.json` | `settings put`，写后回读重试 | 个性化推荐、上报、以及**反诈/病毒扫描/诈骗检测**全部回来 |
+| `a1-privacy-ops` | 9 个系统/服务包不许读「你在用哪些 App」；百度网盘不要短信/通讯录/通话记录 | `usage.txt` `appops.conf` | `cmd appops` + `pm revoke` | 使用统计被读取，网盘恢复三项权限 |
+| `a2-honor-ads-freeze` | 9 个广告位宿主整包冻结 | `pkgs.txt` | `pm disable-user` | 负一屏、杂志锁屏、快应用/快游戏、元服务、壁纸、遥测推送全部复活 |
+| `a3-honor-ads-components` | 13 个系统包里的 124 个 `com.hihonor.adsdk.*` 组件禁用（119 落地 Activity + 5 适配器 Provider） | `targets.txt` | `pm disable`（组件级） | 广告落地页/激励视频能打开，包本身还在 |
+| `a4-abox-lockdown` | 不让本机其他 App 扫到代理端口 | `lockdown.sh` 里的 `PORTS` | `iptables REJECT`（仅 `iif lo`） | 本机任意 App 可连 10810/65535，扫得出透明代理 |
+| `a5-notif-channels` | 32 条营销/推荐通知渠道封死 | `channels.tsv` | `app_process` + `NotificationManager.updateNotificationChannel` | 营销通知恢复，功能通知自始至终不受影响 |
+
+### 重叠与分层
+
+只有一处**真重复**，已经删掉；其余是同一目标的不同层，互不替代：
+
+- ~~`a1` 里的 `com.android.adservices.api`~~ → 与 `a2` 整包冻结重复，已从 `usage.txt` 移除。
+- `a0` + `a2`：`a0` 写 `hiboard.recommend.status` / `hiboard.improve.status` /
+  `show_hiboard_notification_state`，而 `a2` 把 `com.hihonor.hiboard` 整包冻结了 —— 冻结期间这三键空转，
+  解冻后才有意义。保留（幂等、无副作用）。
+- `a0` + `a3` + `a5`：`themememanager` / `hncloud` / `honor.browser` 三个包同时出现。
+  三层各管一段：`a3` 砍广告落地页 → `a0` 关推荐开关 → `a5` 封通知渠道。任何一层单独都存在漏洞。
+- `a0` 的 `deeplink.json` 前 4 条指向 `com.huawei.appmarket` / `com.huawei.gamebox`，
+  **本机没装这两个包**（Honor 用 `com.hihonor.appmarket`），属于空配置；其余 14 条（淘宝/京东/拼多多…）有效。
+- `a4` 与其他模块零交集：它管的是「代理可探测性」，和广告/隐私无关。
+
+### 一个必须知道的取舍
+
+`a0` 的 38 键里有 **14 项是关掉安全防护**，不是减少广告：
+`hsm_ad_detect` `hsm_antivirus` `hsm_phonescan` `app_check_risk` `antifraud_remind`
+`fraud_cloud_security_check` `anti_fraud_status` `ai_scam_detect_*`（5 项）
+`hn_hsm_payment_risk_reminder_state` `meeting_live_fake_detect_state` `video_live_fake_detect_state`。
+它们减少的是**厂商上报**，代价是**诈骗/病毒/换脸检测**也没了。想要纯净的「只关广告」，
+把这 14 行从 `a0/keys.txt` 删掉即可（脚本按文件逐行执行，不认分组）。
 
 ## Install
 

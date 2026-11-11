@@ -7,4 +7,3 @@ com.hihonor.id
 com.hihonor.brain
 com.hihonor.ouc
 com.hihonor.hncloud
-com.android.adservices.api
