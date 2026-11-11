@@ -1,0 +1,32 @@
+com.android.vending	payments-deals-and-recommendations	2	付款事宜、特惠信息和推荐内容
+com.google.android.apps.walletnfcrel	wallet.za.offers_and_rewards	2	促销活动
+com.google.android.gms	com.google.android.gms.mobiledataplan.NOTIFICATION.UPSELL_OFFER	3	流量套餐优惠
+com.google.android.gms	Auto lock promo	2	选择启用盗窃防护
+com.hihonor.android.thememanager	com.hihonor.android.pushagent.LOW.755203pnc	2	营销通知
+com.hihonor.appmarket	hihonor_market_push_notify	4	推送通知
+com.hihonor.appmarket	hihonor_market_ordinary_notify	3	普通通知
+com.hihonor.appmarket	hihonor_market_update_new	2	应用更新通知
+com.hihonor.appmarket	market_install_channel_new	2	下载安装通知
+com.hihonor.appmarket	hihonor_market_safety_check_new	2	安全检测通知
+com.hihonor.appmarket	hihonor_market_clean_garbage_new	2	清理加速通知
+com.hihonor.eyesense	notify_recommend_channel	4	护眼推荐
+com.hihonor.hiboard	com.hihonor.android.pushagent.low70619v1	2	营销通知
+com.hihonor.hncloud	com.hihonor.android.pushagent.LOW.307603pnc	2	营销通知
+com.hihonor.magicvoice	com.hihonor.android.pushagent.LOW.644603pnc	2	营销通知
+com.hihonor.ouc	com.hihonor.android.pushagent.LOW.114602pnc	2	营销通知
+com.hihonor.parentcontrol	parentcontrol_extension_recommond_channel_id_high	4	干眼友好推荐
+com.hihonor.phoneservice	com.hihonor.android.pushagent.LOW.346803pnc	2	营销通知
+com.hihonor.photos	ai-editor-channel	2	一键大片推荐
+com.hihonor.suggestion	tips	4	玩机技巧推荐
+com.honor.browser	msg_center_recommend_notify	3	精彩推荐
+com.honor.browser	msg_center_recommend_streamer	4	精彩推荐
+com.linkedin.android	LiveEventChannelWithSound	3	直播活动
+com.microsoft.office.officehubrow	401_recommendations	3	产品推荐:
+com.microsoft.skydrive	cellular_upload_promotion	3	随时随地备份照片
+com.openai.chatgpt	marketing	3	营销
+com.ss.android.ugc.aweme	com.hihonor.android.pushagent.LOW.274703pnc	2	营销通知
+com.twitter.android	1805611730275549186-recommendations_high_priority_2	4	X 推荐
+com.twitter.android	1525528223978663936-recommendations_high_priority_2	4	X 推荐
+com.unionpay	unionpay_notify_marketing	3	营销消息
+com.unionpay	com.hihonor.android.pushagent.LOW.913703pnc	2	营销通知
+com.zhihu.android	com.hihonor.android.pushagent.LOW.927503pnc	3	营销通知

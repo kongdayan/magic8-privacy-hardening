@@ -44,7 +44,7 @@ Error: Invalid module ID: '20-honor-ads-freeze'. Must match /^[a-zA-Z][a-zA-Z0-9
 ```
 
 Numeric prefixes show up in `module list` but are rejected by `module action`.
-Use `a0-… a4-…` if you also want deterministic ordering.
+Use `a0-… a5-…` if you also want deterministic ordering.
 
 ## Execution order
 
@@ -56,6 +56,7 @@ a1-privacy-ops          ← binder to AppOpsService
 a2-honor-ads-freeze     ← pm, light
 a3-honor-ads-components ← pm × 124, heaviest
 a4-abox-lockdown        ← iptables, independent
+a5-notif-channels       ← app_process + binder to NotificationManagerService
 ```
 
 Do the fragile binder work **before** the heavy `pm` storm. Disabling 124 components can make
@@ -104,6 +105,10 @@ su -c 'sh /data/adb/modules/a3-honor-ads-components/service.sh; echo rc=$?'
 tail -5 /data/local/tmp/a3-honor-ads-components.log
 su -c 'sh -x /data/adb/modules/a0-privacy-settings/service.sh'   # trace
 ```
+
+`a5` is the one module that needs a helper process (`app_process` + `ch.dex`) rather than
+plain shell tools — see [06-notification-channels.md](06-notification-channels.md) for why,
+plus the dex-version and `pm list packages` substring traps.
 
 Note: `ksud services` is **not** a reliable manual re-trigger (it expects module context and
 de-duplicates). To test a `service.sh`, invoke it by absolute path.

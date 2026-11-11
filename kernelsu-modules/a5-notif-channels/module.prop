@@ -1,0 +1,6 @@
+id=a5-notif-channels
+name=营销通知渠道封禁（channel 级）
+version=1.0
+versionCode=1
+author=kongdayan
+description=按 notification channel 精准封禁营销/推荐类通知：importance 置 0 并写入 userLockedFields，app 无法自行改回，私信/推送/订单等功能渠道不受影响。32 条渠道清单可编辑，幂等，Action 按钮可整组还原。

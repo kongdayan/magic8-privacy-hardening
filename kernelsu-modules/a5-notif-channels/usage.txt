@@ -1,0 +1,19 @@
+a5-notif-channels — 按 channel 封禁营销通知
+
+清单: channels.tsv
+  pkg <TAB> channelId <TAB> 原始importance <TAB> 显示名
+  原始importance 只在 restore 时用来还原；新增行就多封一条，删行就不用管。
+
+查看当前状态:
+  su -c 'dumpsys notification --noredact | grep -A12 "AppSettings: com.zhihu.android"'
+
+手动封一条（pkg, uid, 目标imp, channelId, 显示名）:
+  su -c 'CLASSPATH=/data/adb/modules/a5-notif-channels/ch.dex \
+         app_process /system/bin Ch com.zhihu.android 10336 0 \
+         com.hihonor.android.pushagent.LOW.927503pnc 营销通知'
+
+整组开关: KernelSU 管理器的 Action 按钮（apply <-> restore）
+日志: /data/local/tmp/a5-notif-channels.log
+
+注意: uid 必须用 `cmd package list packages -U --user 0` 精确取，
+      `pm list packages <filter>` 是子串匹配，取错 uid 会报 Channel does not exist。

@@ -64,12 +64,13 @@ and the KernelSU modules in this repo do that automatically the moment root appe
 ## Layout
 
 ```
-kernelsu-modules/          five independent KernelSU modules (enable/disable separately)
+kernelsu-modules/          six independent KernelSU modules (enable/disable separately)
   a0-privacy-settings/     38 settings keys + deeplink interception
   a1-privacy-ops/          appops + sensitive-permission revoke
   a2-honor-ads-freeze/     9 packages frozen (pm disable-user)
   a3-honor-ads-components/ 124 com.hihonor.adsdk.* components
   a4-abox-lockdown/        loopback port lockdown for the proxy app
+  a5-notif-channels/       32 marketing notification channels blocked at channel level
 docs/
   01-persistence-model.md          what survives reboot vs what does not
   02-kernelsu-modules.md           module structure, execution order, four gotchas
@@ -77,6 +78,7 @@ docs/
   04-proxy-detectability.md        can apps detect a transparent proxy? what leaks
   05-tailscale-coexistence.md      running Tailscale and a TPROXY proxy together
 scripts/
+  notif-channel-dex/        host-side channel CLI + the smali/Java source of ch.dex
   abox-lockdown.sh          standalone port lockdown (no module needed)
   rollback-ads-activities.sh generated rollback for a3
 install.sh                  copy modules into /data/adb/modules (requires root)
@@ -106,9 +108,10 @@ su -c 'ksud module action a2-honor-ads-freeze'    # toggle one group
 su -c 'ksud module disable a3-honor-ads-components'  # stop auto-applying
 su -c 'ksud module enable  a3-honor-ads-components'
 su -c 'ksud module uninstall a4-abox-lockdown'
+su -c 'ksud module action a5-notif-channels'      # 营销通知渠道：封禁 <-> 还原
 ```
 
-Execution order is alphabetical by module id, which is why the ids are `a0`…`a4`:
+Execution order is alphabetical by module id, which is why the ids are `a0`…`a5`:
 the fragile `settings` writes run first, the heavy 124× `pm disable` runs later.
 
 ## Safety notes
@@ -120,6 +123,9 @@ the fragile `settings` writes run first, the heavy 124× `pm disable` runs later
   **not** stop the ad SDK's network reporting, which runs inside the host app process.
   For that you need domain-level blocking.
 - Uninstalling `a2` does **not** un-freeze the packages (deliberate). Use its Action button.
+- `a5` blocks individual notification **channels** (`importance=0` + `userLockedFields`),
+  not whole apps: DMs, order updates and push still work. Restore uses the original
+  importance recorded in `channels.tsv`.
 - Some `settings` keys are rewritten by Honor system services on boot
   (`network_recommendations_enabled` is hardcoded). The module replays them on every root
   acquisition and logs a `REBOUND` line when one survives.
