@@ -74,6 +74,7 @@ docs/
 scripts/
   notif-channel-dex/        host-side channel CLI + the smali/Java source of ch.dex
   abox-lockdown.sh          standalone port lockdown (no module needed)
+  degrade-watch.sh          daily snapshot of msc config / cpu caps / battery / volume
   rollback-ads-activities.sh generated rollback for a3
 install.sh                  copy modules into /data/adb/modules (requires root)
 ```
