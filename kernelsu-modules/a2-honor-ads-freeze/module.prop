@@ -1,6 +1,6 @@
 id=a2-honor-ads-freeze
-name=广告宿主整包冻结
-version=1.1
-versionCode=2
+name=关闭不用的荣耀功能
+version=1.2
+versionCode=3
 author=kongdayan
-description=pm disable-user 冻结 9 个广告位宿主（负一屏 · 杂志锁屏 · 动态壁纸 · 快应用 · 快游戏 · 元服务 · 遥测推送 · adservices）。整包冻结，功能不要了才用这个。
+description=自动停用负一屏、杂志锁屏、荣耀动态壁纸、快应用、快游戏、元服务及部分遥测和广告服务，共 9 个应用。保留应用数据；对应功能暂停使用。

@@ -1,6 +1,6 @@
 id=a1-privacy-ops
-name=第三方读取限制
-version=1.2
-versionCode=3
+name=限制使用记录与敏感权限
+version=1.3
+versionCode=4
 author=kongdayan
-description=9 个系统/服务包禁 GET_USAGE_STATS（不让它们读你在用哪些 App）；百度网盘撤销短信/通讯录/通话记录三项权限。清单在 usage-stats-pkgs.txt。
+description=自动限制 9 个系统或服务应用读取应用使用记录，并撤销百度网盘的短信、通讯录和通话记录权限。其他权限保持不变。

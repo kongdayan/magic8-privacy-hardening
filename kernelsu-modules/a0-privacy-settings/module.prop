@@ -1,6 +1,6 @@
 id=a0-privacy-settings
-name=推荐与上报开关
-version=1.2
-versionCode=3
+name=减少推荐与上报
+version=1.3
+versionCode=4
 author=kongdayan
-description=22 项 settings 键：广告推荐 11 · 遥测与体验上报 8 · OAID / 分享 ID 限制 2 · 云端网络推荐 1，外加 18 条 Deeplink 前缀拦截。只管「少上报、少推荐」，不碰安全检测（那部分在 a0b）。写后回读。
+description=自动减少系统推荐、体验上报和广告标识使用，并限制部分应用跳转。保留现有 22 项开关和 18 条跳转规则；厂商检测提醒由独立模块管理。

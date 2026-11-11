@@ -81,6 +81,22 @@ install.sh                  copy modules into /data/adb/modules (requires root)
 
 ## 模块一览
 
+### 日常显示名称（2026-11-11）
+
+提权完成后按现有模块生命周期自动执行，无需逐项确认。本次仅更新名称和说明：模块 ID、脚本、处置清单、已有开关状态均保留，不重新应用规则。
+
+| 模块 ID | 管理器显示名称 |
+|---|---|
+| `a0-privacy-settings` | 减少推荐与上报 |
+| `a0b-safety-off` | 关闭厂商检测提醒 |
+| `a1-privacy-ops` | 限制使用记录与敏感权限 |
+| `a2-honor-ads-freeze` | 关闭不用的荣耀功能 |
+| `a3-honor-ads-components` | 关闭荣耀广告组件 |
+| `a4-abox-lockdown` | 代理本地端口限制 |
+| `a5-notif-channels` | 减少营销通知 |
+
+名称不改变功能范围。a5 的现有 32 条清单还包括应用市场的更新、安装和检测渠道，并非全部为纯营销；本次未调整清单。停用模块仅停止后续自动执行，已持久化的修改仍可能保留；现有 restore 也并非全部按安装前真实原值恢复。
+
 每行一句话说清「做什么 / 数据在哪 / 用什么手段 / 关掉会失去什么」。七个模块**不共享任何一行配置**，
 但同一个 app 可能被三层同时覆盖（见下一节），这是分层，不是重复。
 
@@ -92,17 +108,17 @@ install.sh                  copy modules into /data/adb/modules (requires root)
 |---|---|---|---|---|
 | `a0-privacy-settings` | 22 项系统开关：推荐 11 · 遥测与体验上报 8 · OAID/分享 ID 限制 2 · 云端网络推荐 1，外加 18 条 Deeplink 前缀拦截 | `keys.txt` `deeplink.json` | `settings put`，写后回读重试 | 个性化推荐、上报重新打开 |
 | `a0b-safety-off` | **16 项全是关掉 Honor 的安全检测**：HiSafeManager 广告/病毒/手机扫描 3 · 反诈提醒与云端核查 4 · 支付风险提醒 1 · WiFi 云端安全检测 1 · AI 诈骗/换脸/会中伪造检测 7 | `keys.txt` | `settings put`（同一手段，独立开关） | **诈骗提醒、病毒扫描、换脸检测全部回来**（这也正是默认要有它们的原因） |
-| `a1-privacy-ops` | 9 个系统/服务包不许读「你在用哪些 App」；百度网盘不要短信/通讯录/通话记录 | `usage.txt` `appops.conf` | `cmd appops` + `pm revoke` | 使用统计被读取，网盘恢复三项权限 |
+| `a1-privacy-ops` | 9 个系统/服务包不许读「你在用哪些 App」；百度网盘不要短信/通讯录/通话记录 | `usage-stats-pkgs.txt` `appops.conf` | `cmd appops` + `pm revoke` | 使用统计被读取，网盘恢复三项权限 |
 | `a2-honor-ads-freeze` | 9 个广告位宿主整包冻结 | `pkgs.txt` | `pm disable-user` | 负一屏、杂志锁屏、快应用/快游戏、元服务、壁纸、遥测推送全部复活 |
 | `a3-honor-ads-components` | 13 个系统包里的 124 个 `com.hihonor.adsdk.*` 组件禁用（119 落地 Activity + 5 适配器 Provider） | `targets.txt` | `pm disable`（组件级） | 广告落地页/激励视频能打开，包本身还在 |
 | `a4-abox-lockdown` | 不让本机其他 App 扫到代理端口 | `lockdown.sh` 里的 `PORTS` | `iptables REJECT`（仅 `iif lo`） | 本机任意 App 可连 10810/65535，扫得出透明代理 |
-| `a5-notif-channels` | 32 条营销/推荐通知渠道封死 | `channels.tsv` | `app_process` + `NotificationManager.updateNotificationChannel` | 营销通知恢复，功能通知自始至终不受影响 |
+| `a5-notif-channels` | 关闭 32 条选定通知渠道，含营销及部分应用市场功能渠道 | `channels.tsv` | `app_process` + `NotificationManager.updateNotificationChannel` | 按清单中的 importance 恢复，并非完整原始渠道备份 |
 
 ### 重叠与分层
 
 只有一处**真重复**，已经删掉；其余是同一目标的不同层，互不替代：
 
-- ~~`a1` 里的 `com.android.adservices.api`~~ → 与 `a2` 整包冻结重复，已从 `usage.txt` 移除。
+- ~~`a1` 里的 `com.android.adservices.api`~~ → 与 `a2` 整包冻结重复，已从 `usage-stats-pkgs.txt` 移除。
 - `a0` + `a2`：`a0` 写 `hiboard.recommend.status` / `hiboard.improve.status` /
   `show_hiboard_notification_state`，而 `a2` 把 `com.hihonor.hiboard` 整包冻结了 —— 冻结期间这三键空转，
   解冻后才有意义。保留（幂等、无副作用）。
@@ -165,9 +181,10 @@ the fragile `settings` writes run first, the heavy 124× `pm disable` runs later
   **not** stop the ad SDK's network reporting, which runs inside the host app process.
   For that you need domain-level blocking.
 - Uninstalling `a2` does **not** un-freeze the packages (deliberate). Use its Action button.
-- `a5` blocks individual notification **channels** (`importance=0` + `userLockedFields`),
-  not whole apps: DMs, order updates and push still work. Restore uses the original
-  importance recorded in `channels.tsv`.
+- `a5` blocks selected notification **channels** (`importance=0` + `userLockedFields`),
+  not whole apps. Channels outside the list are untouched; the current list also includes
+  app-market update, installation and detection channels. Restore uses the configured
+  importance in `channels.tsv`, which is not a complete original-channel backup.
 - Some `settings` keys are rewritten by Honor system services on boot
   (`network_recommendations_enabled` is hardcoded). The module replays them on every root
   acquisition and logs a `REBOUND` line when one survives.
