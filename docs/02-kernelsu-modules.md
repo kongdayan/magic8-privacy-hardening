@@ -44,14 +44,15 @@ Error: Invalid module ID: '20-honor-ads-freeze'. Must match /^[a-zA-Z][a-zA-Z0-9
 ```
 
 Numeric prefixes show up in `module list` but are rejected by `module action`.
-Use `a0-… a5-…` if you also want deterministic ordering.
+Use `a0-… a6` / `a0b-…` if you also want deterministic ordering.
 
 ## Execution order
 
 Alphabetical by id:
 
 ```
-a0-privacy-settings     ← fragile: binder to SettingsProvider
+a0-privacy-settings     ← fragile: binder to SettingsProvider（少上报/少推荐）
+a0b-safety-off          ← fragile: binder to SettingsProvider（关安全检测，语义与 a0 相反）
 a1-privacy-ops          ← binder to AppOpsService
 a2-honor-ads-freeze     ← pm, light
 a3-honor-ads-components ← pm × 124, heaviest

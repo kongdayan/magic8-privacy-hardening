@@ -6,7 +6,7 @@ log(){ echo "[$(date '+%F %T')] $*" >> "$LOG"; }
 STATE=$(cat "$MODDIR/state" 2>/dev/null); [ -z "$STATE" ] && STATE=apply
 . "$MODDIR/appops.conf"
 log "begin state=$STATE"
-for p in $(cat "$MODDIR/usage.txt"); do
+for p in $(cat "$MODDIR/usage-stats-pkgs.txt"); do
   if [ "$STATE" = restore ]; then cmd appops set --user 0 "$p" GET_USAGE_STATS default </dev/null >/dev/null 2>&1
   else cmd appops set --user 0 "$p" GET_USAGE_STATS ignore </dev/null >/dev/null 2>&1; fi
 done

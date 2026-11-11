@@ -1,6 +1,6 @@
 id=a0-privacy-settings
-name=推荐 / 遥测 / 反诈 开关
-version=1.1
-versionCode=2
+name=推荐与上报开关
+version=1.2
+versionCode=3
 author=kongdayan
-description=38 项 settings 键：推荐 14 · 遥测上报 10 · 反诈与查杀 14（这 14 项是关防护，不是净收益，见 README）+ Deeplink 拦截。写后回读，被系统改写的键每次提权重放。
+description=22 项 settings 键：广告推荐 11 · 遥测与体验上报 8 · OAID / 分享 ID 限制 2 · 云端网络推荐 1，外加 18 条 Deeplink 前缀拦截。只管「少上报、少推荐」，不碰安全检测（那部分在 a0b）。写后回读。

@@ -8,8 +8,8 @@ if [ "$CUR" = apply ]; then NEW=restore; else NEW=apply; fi
 echo "$NEW" > "$MODDIR/state"
 sh "$MODDIR/service.sh"
 N=0
-for p in $(cat "$MODDIR/usage.txt"); do
+for p in $(cat "$MODDIR/usage-stats-pkgs.txt"); do
   case "$(cmd appops get "$p" GET_USAGE_STATS </dev/null 2>/dev/null | head -1)" in *ignore*) N=$((N+1));; esac
 done
-echo "GET_USAGE_STATS=ignore: $N / $(wc -l < "$MODDIR/usage.txt" | tr -d ' ')"
+echo "GET_USAGE_STATS=ignore: $N / $(wc -l < "$MODDIR/usage-stats-pkgs.txt" | tr -d ' ')"
 echo "state=$NEW"

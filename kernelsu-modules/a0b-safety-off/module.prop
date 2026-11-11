@@ -1,0 +1,6 @@
+id=a0b-safety-off
+name=厂商安全检测关断（降防护）
+version=1.0
+versionCode=1
+author=kongdayan
+description=16 项 settings，全部是关掉 Honor 的检测/提醒：HiSafeManager 广告·病毒·手机扫描 3 项、反诈提醒与云端核查 4 项、支付风险提醒 1 项、WiFi 云端安全检测 1 项、AI 诈骗/换脸/会中伪造检测 7 项。这是拿防护换安静，不是减广告——只要广告相关请只装 a0。

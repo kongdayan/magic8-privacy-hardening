@@ -1,6 +1,6 @@
 id=a1-privacy-ops
 name=第三方读取限制
-version=1.1
-versionCode=2
+version=1.2
+versionCode=3
 author=kongdayan
-description=9 个系统/服务包禁 GET_USAGE_STATS（不让它们读你在用哪些 App）；百度网盘撤销短信/通讯录/通话记录三项权限。与 a2 无重叠（adservices 已交给 a2 冻结）。
+description=9 个系统/服务包禁 GET_USAGE_STATS（不让它们读你在用哪些 App）；百度网盘撤销短信/通讯录/通话记录三项权限。清单在 usage-stats-pkgs.txt。

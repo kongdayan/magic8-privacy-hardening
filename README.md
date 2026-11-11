@@ -64,7 +64,7 @@ and the KernelSU modules in this repo do that automatically the moment root appe
 ## Layout
 
 ```
-kernelsu-modules/          six independent KernelSU modules (enable/disable separately)
+kernelsu-modules/          seven independent KernelSU modules (per-module table below)
 docs/
   01-persistence-model.md          what survives reboot vs what does not
   02-kernelsu-modules.md           module structure, execution order, four gotchas
@@ -80,12 +80,17 @@ install.sh                  copy modules into /data/adb/modules (requires root)
 
 ## 模块一览
 
-每行一句话说清「做什么 / 数据在哪 / 用什么手段 / 关掉会失去什么」。六个模块**不共享任何一行配置**，
+每行一句话说清「做什么 / 数据在哪 / 用什么手段 / 关掉会失去什么」。七个模块**不共享任何一行配置**，
 但同一个 app 可能被三层同时覆盖（见下一节），这是分层，不是重复。
+
+`a0` 与 `a0b` 手段相同（都是 `settings put`），拆开是因为**语义相反**：前者「少上报、少推荐」，
+后者「不要检测我」。混在一个模块里，一次 restore 会把广告推荐和反诈提醒一起放回来——这正是
+之前标题写成「广告/遥测/反诈 开关键」的原因，也是这次重排要解决的根源。
 
 | id | 做什么 | 数据文件 | 手段 | 切到 restore 会失去什么 |
 |---|---|---|---|---|
-| `a0-privacy-settings` | 38 项系统开关：**推荐 14 · 遥测上报 10 · 反诈与查杀 14**，外加 18 条 Deeplink 前缀拦截 | `keys.txt` `deeplink.json` | `settings put`，写后回读重试 | 个性化推荐、上报、以及**反诈/病毒扫描/诈骗检测**全部回来 |
+| `a0-privacy-settings` | 22 项系统开关：推荐 11 · 遥测与体验上报 8 · OAID/分享 ID 限制 2 · 云端网络推荐 1，外加 18 条 Deeplink 前缀拦截 | `keys.txt` `deeplink.json` | `settings put`，写后回读重试 | 个性化推荐、上报重新打开 |
+| `a0b-safety-off` | **16 项全是关掉 Honor 的安全检测**：HiSafeManager 广告/病毒/手机扫描 3 · 反诈提醒与云端核查 4 · 支付风险提醒 1 · WiFi 云端安全检测 1 · AI 诈骗/换脸/会中伪造检测 7 | `keys.txt` | `settings put`（同一手段，独立开关） | **诈骗提醒、病毒扫描、换脸检测全部回来**（这也正是默认要有它们的原因） |
 | `a1-privacy-ops` | 9 个系统/服务包不许读「你在用哪些 App」；百度网盘不要短信/通讯录/通话记录 | `usage.txt` `appops.conf` | `cmd appops` + `pm revoke` | 使用统计被读取，网盘恢复三项权限 |
 | `a2-honor-ads-freeze` | 9 个广告位宿主整包冻结 | `pkgs.txt` | `pm disable-user` | 负一屏、杂志锁屏、快应用/快游戏、元服务、壁纸、遥测推送全部复活 |
 | `a3-honor-ads-components` | 13 个系统包里的 124 个 `com.hihonor.adsdk.*` 组件禁用（119 落地 Activity + 5 适配器 Provider） | `targets.txt` | `pm disable`（组件级） | 广告落地页/激励视频能打开，包本身还在 |
@@ -100,6 +105,8 @@ install.sh                  copy modules into /data/adb/modules (requires root)
 - `a0` + `a2`：`a0` 写 `hiboard.recommend.status` / `hiboard.improve.status` /
   `show_hiboard_notification_state`，而 `a2` 把 `com.hihonor.hiboard` 整包冻结了 —— 冻结期间这三键空转，
   解冻后才有意义。保留（幂等、无副作用）。
+- `a0` 与 `a0b`：同一个 `settings` 通道、两套 state，字母序 `a0` < `a0b` < `a1`，两个 settings 层
+  都排在 `a2`/`a3` 的 pm 风暴之前（风暴期间 SettingsProvider 会短暂拒绝事务）。
 - `a0` + `a3` + `a5`：`themememanager` / `hncloud` / `honor.browser` 三个包同时出现。
   三层各管一段：`a3` 砍广告落地页 → `a0` 关推荐开关 → `a5` 封通知渠道。任何一层单独都存在漏洞。
 - `a0` 的 `deeplink.json` 前 4 条指向 `com.huawei.appmarket` / `com.huawei.gamebox`，
@@ -108,12 +115,15 @@ install.sh                  copy modules into /data/adb/modules (requires root)
 
 ### 一个必须知道的取舍
 
-`a0` 的 38 键里有 **14 项是关掉安全防护**，不是减少广告：
+`a0b-safety-off` 整包就是**关掉安全防护**，不是减少广告：
 `hsm_ad_detect` `hsm_antivirus` `hsm_phonescan` `app_check_risk` `antifraud_remind`
 `fraud_cloud_security_check` `anti_fraud_status` `ai_scam_detect_*`（5 项）
-`hn_hsm_payment_risk_reminder_state` `meeting_live_fake_detect_state` `video_live_fake_detect_state`。
-它们减少的是**厂商上报**，代价是**诈骗/病毒/换脸检测**也没了。想要纯净的「只关广告」，
-把这 14 行从 `a0/keys.txt` 删掉即可（脚本按文件逐行执行，不认分组）。
+`hn_hsm_payment_risk_reminder_state` `meeting_live_fake_detect_state` `video_live_fake_detect_state`
+`wifi_cloud_security_check`。
+
+它确实减少了厂商上报，但代价是**诈骗提醒、病毒扫描、换脸/会中伪造检测**也没了。
+所以它是独立模块、默认可以单独关掉：**只用广告相关需求的话，直接不要装 `a0b`**，
+`a0` 不会连带影响任何安全能力。
 
 ## Install
 

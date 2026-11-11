@@ -1,0 +1,16 @@
+global wifi_cloud_security_check 0
+system hsm_ad_detect 0
+global app_check_risk 0
+global antifraud_remind 0
+global fraud_cloud_security_check 0
+secure anti_fraud_status 0
+secure ai_scam_detect_switch 0
+secure ai_scam_detect_always_switch 0
+secure ai_scam_detect_smart_switch 0
+secure ai_call_content_scam_detect_switch 0
+secure ai_scam_meeting_switch 0
+secure meeting_live_fake_detect_state 0
+secure video_live_fake_detect_state 0
+secure hn_hsm_payment_risk_reminder_state 0
+system hsm_antivirus 0
+system hsm_phonescan 0
